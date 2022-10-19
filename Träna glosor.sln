@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Träna glosor", "Träna glosor\Träna glosor.csproj", "{8F521415-9C25-48B0-9F4F-54CA94AB996E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Träna Glosor console", "Träna Glosor console\Träna Glosor console.csproj", "{9A8E6AA7-93CE-4F8F-836E-4ABC14A5091E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F521415-9C25-48B0-9F4F-54CA94AB996E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F521415-9C25-48B0-9F4F-54CA94AB996E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F521415-9C25-48B0-9F4F-54CA94AB996E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F521415-9C25-48B0-9F4F-54CA94AB996E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A8E6AA7-93CE-4F8F-836E-4ABC14A5091E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A8E6AA7-93CE-4F8F-836E-4ABC14A5091E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A8E6AA7-93CE-4F8F-836E-4ABC14A5091E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A8E6AA7-93CE-4F8F-836E-4ABC14A5091E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D71EECF-BE8F-46C9-A762-9F4DC855F9D2}
+	EndGlobalSection
+EndGlobal
