@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using Träna_glosor;
+﻿using Träna_glosor;
 
 internal class Program
 {
@@ -17,45 +15,44 @@ internal class Program
         Console.WriteLine("     -words <listname> <sortByLanguage>");
         Console.WriteLine("     -count <listname>");
         Console.WriteLine("     -practice <listname>");
-        
-         static void Print(string[] words)
-        {
-            foreach (var word in words)
-            {
-                Console.WriteLine(word);
-            }
-        }
-        Action<string[]> ShowTranaslations = Print;
-        var wordList = WordList.LoadList("Clohtes");
-       // wordList.Add("hat","hatt","sombrero");
-        wordList.GetWordToPractice();
+        //Remove("Clohtes",1,"byxor","skjorta");
 
-        string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        // string[] files = Directory.GetFiles(path, "*.dat");
-        DirectoryInfo directories = new DirectoryInfo(path);
-        FileInfo[] files = directories.GetFiles("*.dat");
-      
+        //New("Forniture","swedish","english");
+
+        //var wordList = WordList.LoadList("Clohtes");
+        // wordList.Add("Hat".ToLower(),"haTT".ToLower(),"sombRerO".ToLower());
+        //wordList.Count();
+        // var w = wordList.GetWordToPractice();
+        //var wow = WordList.LoadList("Clohtes");
+        //wordList.List(1,ShowTranaslations);
+        //string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        //// string[] files = Directory.GetFiles(path, "*.dat");
+        //DirectoryInfo directories = new DirectoryInfo(path);
+        //FileInfo[] files = directories.GetFiles("*.dat");
+        Add("Clohtes");
 
     }
-    public static List<string> _lists()
+    public static void Lists()
     {
-        string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        DirectoryInfo directories = new DirectoryInfo(path);
-        FileInfo[] files = directories.GetFiles("*.dat");
-        List<string> filesNames = new List<string>();
-        foreach (var file in files)
+
+        var lists = WordList.GetLists();
+        foreach (var list in lists)
         {
-            Console.WriteLine(Path.GetFileNameWithoutExtension(file.Name));
-            filesNames.Add(Path.GetFileNameWithoutExtension(file.Name));
+            Console.WriteLine(list.ToUpper());
         }
-        return filesNames;
+
     }
 
-    public static void _new(string listName, params string[] language)
+    public static void New(string listName, params string[] language)
     {
+
+        if (language.Length < 2)
+        {
+            throw new ArgumentException("       You gotta enter at leat two languages for the new list".ToUpper());
+        }
         var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         Console.WriteLine(dir);
-        string path = Path.Combine( $@"{dir}\{listName}.dat");
+        string path = Path.Combine($@"{dir}\{listName}.dat");
         if (!File.Exists(path))
         {
             using (StreamWriter stream = new StreamWriter(path))
@@ -68,195 +65,230 @@ internal class Program
 
                 }
             }
+            Add(listName);
         }
         else
         {
-            using (StreamWriter stream = new StreamWriter(path, append: true))
-            {
-
-                string languages = string.Join(";", language);
-                foreach (var lang in languages)
-                {
-                    stream.Write(lang);
-
-                }
-            }
+            Console.WriteLine("     The list already exists! Try with another Name".ToUpper());
         }
-        _add(listName);
+
     }
 
-    public static void _add(string name)
+    public static void Add(string listName)
     {
-        var listNames = _lists();
-        string languages = String.Empty;
+        var list = WordList.LoadList(listName);
+
         string enteredWord = "0";
-        List<string> enteredWords = new List<string>();
-        List<string> languagesList = new List<string>();
 
-
-        string path = SearchedList(name);
-
-        using (FileStream fs = File.OpenRead(path))
+        while (enteredWord != " " && enteredWord != "")
         {
-            byte[] b = new byte[1024];
-            UTF8Encoding temp = new UTF8Encoding(true);
-            while (fs.Read(b, 0, b.Length) > 0)
+            List<string> listOfWords = new List<string>();
+
+            for (int i = 0; i < list.Languages.Length; i++)
             {
-                languages = File.ReadAllLines(path).First();
+                Console.WriteLine($" Enter a word in the following language:    {list.Languages[i].ToUpper()}");
+                enteredWord = Console.ReadLine().ToLower();
+                if (enteredWord == "" || enteredWord == " ")
+                {
+                    break;
+                }
+                else
+                {
+                    listOfWords.Add(enteredWord);
+                }
             }
-        }
-        //take away coma between words
-        languagesList = languages.Split(';').ToList();
-
-        //Get one words and its translation on each language
-
-        for (int i = 0; i < languagesList.Count; i++)
-        {
-            Console.WriteLine($" Enter a word in the following language:    {languagesList[i].ToUpper()}");
-            enteredWord = Console.ReadLine();
-            if (enteredWord == "")
+            if (enteredWord == "" || enteredWord == " ")
             {
                 break;
             }
-            else
-            {
-                enteredWords.Add(enteredWord);
-            }
+            list.Add(listOfWords.ToArray());
         }
+
     }
 
-    public static void Remove(string listaName, string language, params string[] words)
+    public static void Remove(string listName, int language, params string[] words)
     {
-        string path = SearchedList(listaName);
-        string languages = string.Empty;
-        string Words = string.Empty;
-        List<string> wordsToErase = words.ToList();
-        List<string> wordsInFile = new List<string>();
-        List<string> languagesList = new List<string>();
-        List<string> wordz = new List<string>();
 
-        int count = 0;
-        string line;
-        TextReader rdr = new StreamReader(path);
-        while ((line = rdr.ReadLine()) != null)
+
+        var list = WordList.LoadList(listName);
+        foreach (var word in words)
         {
-            count++;
+            list.Remove(language, word);
         }
-        rdr.Close();
-        using (StreamReader reader = new StreamReader(path))
-        {
-            while (!reader.EndOfStream)
-            {
+        //using (StreamReader reader = new StreamReader(path))
+        //{
+        //    while (!reader.EndOfStream)
+        //    {
 
 
-                wordsInFile.Add(reader.ReadLine());
-            }
-            //example
-            //str.ReadToEnd();
+        //        wordsInFile.Add(reader.ReadLine());
+        //    }
+        //    //example
+        //    //str.ReadToEnd();
 
-        }
+        //}
 
-        languagesList = wordsInFile[0].Split(';').ToList();
-        //Find the language
-        foreach (var lang in languagesList)
-        {
-            int i = 0;
-            int x = 0;
-            bool a = false;
-            if (language.ToLower() == lang.ToLower())
-            {
-                //Remove the selected words from the file list
-                for (x = 1; x < wordsInFile.Count; x++)
-                {
-                    wordz = wordsInFile[x].Split(';').ToList();
+        //languagesList = wordsInFile[0].Split(';').ToList();
+        ////Find the language
+        //foreach (var lang in languagesList)
+        //{
+        //    int i = 0;
+        //    int x = 0;
+        //    bool a = false;
+        //    if (language.ToLower() == lang.ToLower())
+        //    {
+        //        //Remove the selected words from the file list
+        //        for (x = 1; x < wordsInFile.Count; x++)
+        //        {
+        //            wordz = wordsInFile[x].Split(';').ToList();
 
-                    for (i = 0; i < wordsToErase.Count; i++)
-                    {
-                        if (wordz.Contains(wordsToErase[i]))
-                        {
-                            wordz.Remove(wordsToErase[i]);
-                        }
-                    }
+        //            for (i = 0; i < wordsToErase.Count; i++)
+        //            {
+        //                if (wordz.Contains(wordsToErase[i]))
+        //                {
+        //                    wordz.Remove(wordsToErase[i]);
+        //                }
+        //            }
 
-                    string str = string.Empty;
-                    //str += ";";
-                    str += string.Join(";", wordz);
-                    //str += ";";
-                    //foreach (var w in wordz)
-                    //{
-                    //    str += w + ";" ;
+        //            string str = string.Empty;
+        //            //str += ";";
+        //            str += string.Join(";", wordz);
+        //            //str += ";";
+        //            //foreach (var w in wordz)
+        //            //{
+        //            //    str += w + ";" ;
 
-                    //}
+        //            //}
 
-                    wordsInFile[x] = str;
-                }
+        //            wordsInFile[x] = str;
+        //        }
 
-            }
-        }
-        using (StreamWriter stream = new StreamWriter(path))
-        {
+        //    }
+        //}
+        //using (StreamWriter stream = new StreamWriter(path))
+        //{
 
-            foreach (var word in wordsInFile)
-            {
+        //    foreach (var word in wordsInFile)
+        //    {
 
-                if (word != ";")
-                {
-                    stream.WriteLine(word);
-                }
+        //        if (word != ";")
+        //        {
+        //            stream.WriteLine(word);
+        //        }
 
-            }
-        }
+        //}
+        //}
     }
 
-    public static void Word(string listaName, string sortByLanguage = " ")
+    public static void Words(string listaName, int sortByLanguage = 0)
     {
-        string list = SearchedList(listaName);
-        List<string> wordsToSort = new List<string>();
-        string raw = string.Empty;
-        List<string> languagesList = new List<string>();
-        using (StreamReader reader = new StreamReader(list))
+        static void Print(string[] words)
         {
-            while (!reader.EndOfStream)
+            foreach (var word in words)
             {
-                raw = reader.ReadLine();
-                wordsToSort.Add(raw);
+                Console.Write($"{word} ");
             }
+            Console.WriteLine();
         }
-        string languages = wordsToSort[0];
-        languagesList = languages.Split(';').ToList();
-        string firstLanguage = languagesList[0];
-        if (sortByLanguage != " ")
+        Action<string[]> showTranslations = Print;
+
+        var list = WordList.LoadList(listaName);
+
+        if (list.Languages.Length - 1 < sortByLanguage)
         {
-             var orderedList = wordsToSort.OrderBy(x => x.Length);
-            foreach (var word in orderedList)
-            {
-                Console.WriteLine(word);
-            }
+            list.List(sortByLanguage, showTranslations);
         }
         else
         {
-            var orderedList = wordsToSort.OrderBy(firstLanguage => firstLanguage.Length);
-            foreach (var word in orderedList)
-            {
-                Console.WriteLine(word);
-            }
+            Console.WriteLine(      "There no language at the index that you entered!".ToUpper());
         }
+
+
+        //List<string> wordsToSort = new List<string>();
+        //string raw = string.Empty;
+        //List<string> languagesList = new List<string>();
+        //using (StreamReader reader = new StreamReader(list))
+        //{
+        //    while (!reader.EndOfStream)
+        //    {
+        //        raw = reader.ReadLine();
+        //        wordsToSort.Add(raw);
+        //    }
+        //}
+        //string languages = wordsToSort[0];
+        //languagesList = languages.Split(';').ToList();
+        //string firstLanguage = languagesList[0];
+        //if (sortByLanguage != " ")
+        //{
+        //    var orderedList = wordsToSort.OrderBy(x => x.Length);
+        //    foreach (var word in orderedList)
+        //    {
+        //        Console.WriteLine(word);
+        //    }
+        //}
+        //else
+        //{
+        //    var orderedList = wordsToSort.OrderBy(firstLanguage => firstLanguage.Length);
+        //    foreach (var word in orderedList)
+        //    {
+        //        Console.WriteLine(word);
+        //    }
+        //}
     }
 
-    public static string SearchedList(string listName)
+    public static void Count(string listname)
     {
-        var listNames = _lists();
+        var list = WordList.LoadList(listname);
+        Console.WriteLine(list.Count());
 
-        string searchedList = string.Empty;
+    }
 
-        foreach (var list in listNames)
+    public static void Practice(string listName)
+    {
+        var list = WordList.LoadList(listName);
+        string enteredWord = ".";
+        List<string> practicedWords = new List<string>();
+        int correctTranslations = 0;
+        while (enteredWord != "" && enteredWord != " ")
         {
-            if (listName == list)
+            var word = list.GetWordToPractice();
+            var wordToTranslate = word.Translations[word.FromLanguage];
+            var translation = word.Translations[word.ToLanguage].ToLower();
+            Console.WriteLine($"        Enter the translation of {wordToTranslate} in {list.Languages[word.ToLanguage]}");
+            practicedWords.Add(wordToTranslate);
+            enteredWord = Console.ReadLine();
+            if (enteredWord == translation)
             {
-                searchedList = list;
+                correctTranslations++;
+                Console.WriteLine("     Correct translation");
+            }
+            else
+            {
+                Console.WriteLine("   Wrong answer\n");
             }
         }
-        searchedList = $@"C:\Users\abdia\AppData\Local\{searchedList}.dat";
-        return searchedList;
+        string.Join("-", practicedWords);
+        foreach (var word in practicedWords)
+        {
+            Console.Write($"   {word}");
+        }
+        var percentage = Math.Round(((decimal)correctTranslations / practicedWords.Count) * 100, 2);
+        Console.WriteLine($"\n \n   The average correct translations was {correctTranslations} / {practicedWords.Count} with percentage of {percentage} %");
     }
+    //public static string SearchedList(string listName)
+    //{
+    //    var listNames = WordList.GetLists();
+
+    //    string searchedList = string.Empty;
+
+    //    foreach (var list in listNames)
+    //    {
+    //        if (listName == list)
+    //        {
+    //            searchedList = list;
+    //        }
+    //    }
+    //    searchedList = $@"C:\Users\abdia\AppData\Local\{searchedList}.dat";
+    //    return searchedList;
+    //}
 }

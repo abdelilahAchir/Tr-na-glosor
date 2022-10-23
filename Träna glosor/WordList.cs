@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Träna_glosor
 {
@@ -16,7 +15,6 @@ namespace Träna_glosor
             Name = name;
             Languages = languages;
         }
-
         public static string[] GetLists()
         {
             string path = @"C:\Users\abdia\AppData\Local";
@@ -25,7 +23,6 @@ namespace Träna_glosor
             List<string> filesNames = new List<string>();
             foreach (var file in files)
             {
-                Console.WriteLine(Path.GetFileNameWithoutExtension(file.Name));
                 filesNames.Add(Path.GetFileNameWithoutExtension(file.Name));
             }
             return filesNames.ToArray();
@@ -43,34 +40,116 @@ namespace Träna_glosor
 
             List<string[]> translations = new List<string[]>();
 
+
+            List<Word> words = new List<Word>();
+
+            Random random = new Random();
+
+            int fromLanguage = random.Next(0, translations.Count);
+
+            int toLanguage = random.Next(0, translations.Count);
+
             foreach (var list in listNames)
             {
                 if (name == list)
                 {
                     searchedList = list;
+                    break;
                 }
             }
             var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var path = Path.Combine($@"{dir}\{searchedList}.dat");
             using (StreamReader reader = new StreamReader(path))
             {
-                languagesString = reader.ReadLine();
+                languagesString = reader.ReadLine().ToLower();
 
                 while (!reader.EndOfStream)
                 {
-                    string translationsString = reader.ReadLine();
-                    translations.Add(translationsString.Split(';'));
+                    string translationsString = reader.ReadLine().ToLower();
+
+                    if (translationsString != "")
+                    {
+                        translations.Add(translationsString.Split(';'));
+                    }
                 }
             }
-            languagesList = languagesString.Split(';').ToList();
-            WordList wordList = new WordList(name, languagesList.ToArray());
-            foreach (var w in translations)
+            if (languagesString != "")
             {
-                wordList.Add(w);
+                languagesList = languagesString.Split(';').ToList();
+            }
+
+            WordList wordList = new WordList(name, languagesList.ToArray());
+
+            foreach (var translation in translations)
+            {
+                while (fromLanguage == toLanguage)
+                {
+                    fromLanguage = random.Next(0, translation.Length);
+                    toLanguage = random.Next(0, translation.Length);
+                }
+                if (fromLanguage != toLanguage)
+                {
+                    wordList._words.Add(new Word(fromLanguage, toLanguage, translation));
+                }
             }
             return wordList;
         }
 
+        public void Add(params string[] translations)
+        {
+            Random random = new Random();
+            int fromLanguage = random.Next(0, translations.Length);
+            int toLanguage = random.Next(0, translations.Length);
+
+            
+                if (translations.Length != Languages.Length)
+                {
+                    throw new ArgumentException("The amount of translatiosn is wrong, Add as many tranlations as many languages there is!");
+                }
+                else
+                {
+                    while (fromLanguage == toLanguage)
+                    {
+                        fromLanguage = random.Next(0, translations.Length);
+                        toLanguage = random.Next(0, translations.Length);
+                    }
+                    if (fromLanguage != toLanguage)
+                    {
+                        _words.Add(new Word(fromLanguage, toLanguage, translations));
+                    }     
+            }
+        }
+
+        public bool Remove(int translation, string word)
+        {
+            bool removed = false;
+            _words = _words.Where(w => w.Translations[translation] != word).ToList();
+            removed = true;
+            return removed;
+        }
+
+
+        public void List(int sortByTranslation, Action<string[]> showTranslations)
+        {
+            _words = _words.OrderBy(w => w.Translations[sortByTranslation]).ToList();
+            foreach (var word in _words)
+            {
+                showTranslations(word.Translations);
+            }
+        }
+
+        public Word GetWordToPractice()
+        {
+            Random random = new Random();
+            var rndWord = random.Next(0, _words.Count);
+            var word = _words[rndWord];
+            return word;
+        }
+        public int Count()
+        {
+            var numberOFWords = (_words.Count() * Languages.Length) + Languages.Length;
+            return numberOFWords;
+        }
         public void Save()
         {
             var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -89,70 +168,5 @@ namespace Träna_glosor
             }
         }
 
-        public void Add(params string[] translations)
-        {
-            Random random = new Random();
-            int fromLanguage = random.Next(0,translations.Length);
-            int toLanguage = random.Next(0,translations.Length);
-            if (translations.Length != Languages.Length)
-            {
-                throw new ArgumentException("The amount of translatiosn is wrong, Add as many tranlations as many languages there is!");
-            }
-            else
-            {
-                while (fromLanguage == toLanguage)
-                {
-                    fromLanguage = random.Next(0, translations.Length);
-                    toLanguage = random.Next(0, translations.Length);
-                }
-                if (fromLanguage != toLanguage)
-                {
-                    _words.Add(new Word(fromLanguage,toLanguage,translations));
-
-                }
-            }
-        }
-
-        public bool Remove(int translation, string word)
-        {
-            bool removed = false;
-            foreach (var w in _words)
-            {
-                if (w.Translations[translation] == word)
-                {
-                    _words = _words.Where(w => w.Translations[translation] != word).ToList();
-                    removed = true;
-                }
-            }
-            return removed;
-        }
-        public int Count()
-        {
-            var numberOFWords = (_words.Count() * Languages.Length) + Languages.Length;
-         
-            return numberOFWords;
-        }
-        public void List(int sortByTranslation, Action<string[]> showTranslations)
-        {
-            //sortByTranslation = Vilket språk listan ska sorteras på.
-            _words = _words.OrderBy(w => Languages[sortByTranslation]).ToList();
-            foreach (var w in _words)
-            {
-                foreach ( var t in w.Translations)
-                {
-                    Console.WriteLine(t);
-                }
-            }
-            //showTranslations = Callback som anropas för varje ord i listan.
-        }
-
-        public Word GetWordToPractice()
-        {
-            Random random = new Random();
-            var rndWord = random.Next(0,_words.Count);
-            var word = _words[rndWord];
-            return word;
-        }
-        
     }
 }
