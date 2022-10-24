@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Träna Glosor console": {
+      "commandName": "Project",
+      "commandLineArgs": "-PracTice clohteS"
+    }
+  }
+}

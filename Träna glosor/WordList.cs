@@ -17,13 +17,14 @@ namespace Träna_glosor
         }
         public static string[] GetLists()
         {
-            string path = @"C:\Users\abdia\AppData\Local";
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
             DirectoryInfo directories = new DirectoryInfo(path);
             FileInfo[] files = directories.GetFiles("*.dat");
             List<string> filesNames = new List<string>();
             foreach (var file in files)
             {
-                filesNames.Add(Path.GetFileNameWithoutExtension(file.Name));
+                filesNames.Add(Path.GetFileNameWithoutExtension(file.Name).ToLower());
             }
             return filesNames.ToArray();
         }
@@ -56,43 +57,49 @@ namespace Träna_glosor
                     searchedList = list;
                     break;
                 }
+               
             }
-            var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var path = Path.Combine($@"{dir}\{searchedList}.dat");
-            using (StreamReader reader = new StreamReader(path))
+
+            if (searchedList != "")
             {
-                languagesString = reader.ReadLine().ToLower();
-
-                while (!reader.EndOfStream)
+                var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var path = Path.Combine($@"{dir}\{searchedList}.dat");
+                using (StreamReader reader = new StreamReader(path))
                 {
-                    string translationsString = reader.ReadLine().ToLower();
+                    languagesString = reader.ReadLine().ToLower();
 
-                    if (translationsString != "")
+                    while (!reader.EndOfStream)
                     {
-                        translations.Add(translationsString.Split(';'));
+                        string translationsString = reader.ReadLine().ToLower();
+
+                        if (translationsString != "")
+                        {
+                            translations.Add(translationsString.Split(';'));
+                        }
                     }
                 }
-            }
-            if (languagesString != "")
-            {
-                languagesList = languagesString.Split(';').ToList();
-            }
-
-            WordList wordList = new WordList(name, languagesList.ToArray());
-
-            foreach (var translation in translations)
-            {
-                while (fromLanguage == toLanguage)
+                if (languagesString != "")
                 {
-                    fromLanguage = random.Next(0, translation.Length);
-                    toLanguage = random.Next(0, translation.Length);
+                    languagesList = languagesString.Split(';').ToList();
                 }
-                if (fromLanguage != toLanguage)
+
+                WordList wordList = new WordList(name, languagesList.ToArray());
+
+                foreach (var translation in translations)
                 {
-                    wordList._words.Add(new Word(fromLanguage, toLanguage, translation));
+                    while (fromLanguage == toLanguage)
+                    {
+                        fromLanguage = random.Next(0, translation.Length);
+                        toLanguage = random.Next(0, translation.Length);
+                    }
+                    if (fromLanguage != toLanguage)
+                    {
+                        wordList._words.Add(new Word(fromLanguage, toLanguage, translation));
+                    }
                 }
+                return wordList;
             }
-            return wordList;
+            return null;
         }
 
         public void Add(params string[] translations)
@@ -123,8 +130,29 @@ namespace Träna_glosor
         public bool Remove(int translation, string word)
         {
             bool removed = false;
-            _words = _words.Where(w => w.Translations[translation] != word).ToList();
-            removed = true;
+            foreach (var wrd in _words)
+            {
+                if (wrd.Translations.Length - 1 >= translation)
+                {
+                    _words = _words.Where(w => w.Translations[translation] != word).ToList();
+                    removed = true;
+                }
+                else
+                {
+                    Console.WriteLine($"        The index: {translation} of the language that you entered doesn't exist!".ToUpper());
+                    Console.WriteLine("         You have the following options...".ToUpper());
+                    for (int i = 0; i < Languages.Length; i++)
+                    {
+                        Console.WriteLine($"        {Languages[i]} have the following index {i}".ToUpper());
+                    }
+
+                    removed = false;
+
+                    break;
+                }
+
+            }
+            
             return removed;
         }
 
@@ -157,6 +185,7 @@ namespace Träna_glosor
             using (StreamWriter stream = new StreamWriter(path))
             {
                 var lng = String.Join(';', Languages);
+
                 stream.WriteLine(lng);
 
                 foreach (var word in _words)

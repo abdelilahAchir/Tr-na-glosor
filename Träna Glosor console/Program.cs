@@ -3,33 +3,15 @@
 internal class Program
 {
 
+
     private static void Main(string[] args)
     {
-        ConsoleKey consoleKey = ConsoleKey.F1;
-        Console.WriteLine("     You got the following options:");
+      
+      
 
-        Console.WriteLine("     -lists");
-        Console.WriteLine("     -new <list name> <language 1> <language 2> .. <langauge n> ");
-        Console.WriteLine("     -add <list name>");
-        Console.WriteLine("     -remove <list name> <language> <word 1> <word 2> .. <word n>");
-        Console.WriteLine("     -words <listname> <sortByLanguage>");
-        Console.WriteLine("     -count <listname>");
-        Console.WriteLine("     -practice <listname>");
-        //Remove("Clohtes",1,"byxor","skjorta");
+        Dialog(args);
+        
 
-        //New("Forniture","swedish","english");
-
-        //var wordList = WordList.LoadList("Clohtes");
-        // wordList.Add("Hat".ToLower(),"haTT".ToLower(),"sombRerO".ToLower());
-        //wordList.Count();
-        // var w = wordList.GetWordToPractice();
-        //var wow = WordList.LoadList("Clohtes");
-        //wordList.List(1,ShowTranaslations);
-        //string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        //// string[] files = Directory.GetFiles(path, "*.dat");
-        //DirectoryInfo directories = new DirectoryInfo(path);
-        //FileInfo[] files = directories.GetFiles("*.dat");
-        Add("Clohtes");
 
     }
     public static void Lists()
@@ -51,7 +33,6 @@ internal class Program
             throw new ArgumentException("       You gotta enter at leat two languages for the new list".ToUpper());
         }
         var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        Console.WriteLine(dir);
         string path = Path.Combine($@"{dir}\{listName}.dat");
         if (!File.Exists(path))
         {
@@ -76,34 +57,41 @@ internal class Program
 
     public static void Add(string listName)
     {
-        var list = WordList.LoadList(listName);
+        var list = WordList.LoadList(listName.ToLower());
 
-        string enteredWord = "0";
-
-        while (enteredWord != " " && enteredWord != "")
+        if (list != null)
         {
-            List<string> listOfWords = new List<string>();
+            string enteredWord = "0";
 
-            for (int i = 0; i < list.Languages.Length; i++)
+            while (enteredWord != " " && enteredWord != "")
             {
-                Console.WriteLine($" Enter a word in the following language:    {list.Languages[i].ToUpper()}");
-                enteredWord = Console.ReadLine().ToLower();
+                List<string> listOfWords = new List<string>();
+
+                for (int i = 0; i < list.Languages.Length; i++)
+                {
+                    Console.WriteLine($"    Enter a word in the following language:    {list.Languages[i].ToUpper()}");
+                    enteredWord = Console.ReadLine().ToLower();
+                    if (enteredWord == "" || enteredWord == " ")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        listOfWords.Add(enteredWord);
+                    }
+                }
                 if (enteredWord == "" || enteredWord == " ")
                 {
                     break;
                 }
-                else
-                {
-                    listOfWords.Add(enteredWord);
-                }
+                list.Add(listOfWords.ToArray());
             }
-            if (enteredWord == "" || enteredWord == " ")
-            {
-                break;
-            }
-            list.Add(listOfWords.ToArray());
+            list.Save();
         }
-
+        else
+        {
+            Console.WriteLine("     There no list with such name!".ToUpper());
+        }
     }
 
     public static void Remove(string listName, int language, params string[] words)
@@ -111,73 +99,43 @@ internal class Program
 
 
         var list = WordList.LoadList(listName);
-        foreach (var word in words)
+        if (list != null)
         {
-            list.Remove(language, word);
+            if (list.Languages.Length > language)
+            {
+                foreach (var word in words)
+                {
+                    list.Remove(language, word.ToLower());
+                }
+                list.Save();
+            }
+            else
+            {
+                Console.WriteLine("     The language that you chosen doesn't exist!".ToUpper());
+                Console.WriteLine($"    Chose a index between the following...");
+                for (int i = 0; i < list.Languages.Length; i++)
+                {
+                    Console.WriteLine($"        {list.Languages[i]} is index: {i}");
+                }
+            }
+
         }
-        //using (StreamReader reader = new StreamReader(path))
-        //{
-        //    while (!reader.EndOfStream)
-        //    {
+        else
+        {
+            Console.WriteLine("     The list that you entered doesn't exists!\n".ToUpper());
 
+            var lists = WordList.GetLists();
 
-        //        wordsInFile.Add(reader.ReadLine());
-        //    }
-        //    //example
-        //    //str.ReadToEnd();
-
-        //}
-
-        //languagesList = wordsInFile[0].Split(';').ToList();
-        ////Find the language
-        //foreach (var lang in languagesList)
-        //{
-        //    int i = 0;
-        //    int x = 0;
-        //    bool a = false;
-        //    if (language.ToLower() == lang.ToLower())
-        //    {
-        //        //Remove the selected words from the file list
-        //        for (x = 1; x < wordsInFile.Count; x++)
-        //        {
-        //            wordz = wordsInFile[x].Split(';').ToList();
-
-        //            for (i = 0; i < wordsToErase.Count; i++)
-        //            {
-        //                if (wordz.Contains(wordsToErase[i]))
-        //                {
-        //                    wordz.Remove(wordsToErase[i]);
-        //                }
-        //            }
-
-        //            string str = string.Empty;
-        //            //str += ";";
-        //            str += string.Join(";", wordz);
-        //            //str += ";";
-        //            //foreach (var w in wordz)
-        //            //{
-        //            //    str += w + ";" ;
-
-        //            //}
-
-        //            wordsInFile[x] = str;
-        //        }
-
-        //    }
-        //}
-        //using (StreamWriter stream = new StreamWriter(path))
-        //{
-
-        //    foreach (var word in wordsInFile)
-        //    {
-
-        //        if (word != ";")
-        //        {
-        //            stream.WriteLine(word);
-        //        }
-
-        //}
-        //}
+            if (lists.Length != 0)
+            {
+                Console.WriteLine("     Chose between the fallowing lists...\n".ToUpper());
+                foreach (var s in lists)
+                {
+                    Console.WriteLine($"        {s}".ToUpper());
+                }
+            }
+           
+        }
     }
 
     public static void Words(string listaName, int sortByLanguage = 0)
@@ -194,101 +152,284 @@ internal class Program
 
         var list = WordList.LoadList(listaName);
 
-        if (list.Languages.Length - 1 < sortByLanguage)
+        if (list.Languages.Length - 1 >= sortByLanguage)
         {
             list.List(sortByLanguage, showTranslations);
         }
         else
         {
-            Console.WriteLine(      "There no language at the index that you entered!".ToUpper());
+            Console.WriteLine("     There no language at the index that you entered! You can choose between the following indexes".ToUpper());
+            for (int i = 0; i < list.Languages.Length; i++)
+            {
+                Console.WriteLine($"        {list.Languages[i]} is at index: {i}");
+            }
         }
-
-
-        //List<string> wordsToSort = new List<string>();
-        //string raw = string.Empty;
-        //List<string> languagesList = new List<string>();
-        //using (StreamReader reader = new StreamReader(list))
-        //{
-        //    while (!reader.EndOfStream)
-        //    {
-        //        raw = reader.ReadLine();
-        //        wordsToSort.Add(raw);
-        //    }
-        //}
-        //string languages = wordsToSort[0];
-        //languagesList = languages.Split(';').ToList();
-        //string firstLanguage = languagesList[0];
-        //if (sortByLanguage != " ")
-        //{
-        //    var orderedList = wordsToSort.OrderBy(x => x.Length);
-        //    foreach (var word in orderedList)
-        //    {
-        //        Console.WriteLine(word);
-        //    }
-        //}
-        //else
-        //{
-        //    var orderedList = wordsToSort.OrderBy(firstLanguage => firstLanguage.Length);
-        //    foreach (var word in orderedList)
-        //    {
-        //        Console.WriteLine(word);
-        //    }
-        //}
     }
 
     public static void Count(string listname)
     {
         var list = WordList.LoadList(listname);
-        Console.WriteLine(list.Count());
+        if (list != null)
+        {
+            Console.WriteLine($"        The amount of words in the list {listname} is: {list.Count()}".ToUpper());
+        }
+        else
+        {
+            Console.WriteLine("     The list name the you entered doesn't exist");
+            Console.WriteLine("     Choose between the following lists, or create a new one!");
+           var lists = WordList.GetLists();
+           if (lists.Length != 0)
+           {
+               foreach (var lst in lists)
+               {
+                   Console.WriteLine($"     {lst.ToUpper()}".ToUpper());
+               }
+           }
+        }
 
     }
 
     public static void Practice(string listName)
     {
         var list = WordList.LoadList(listName);
-        string enteredWord = ".";
-        List<string> practicedWords = new List<string>();
-        int correctTranslations = 0;
-        while (enteredWord != "" && enteredWord != " ")
+
+        if (list != null)
         {
-            var word = list.GetWordToPractice();
-            var wordToTranslate = word.Translations[word.FromLanguage];
-            var translation = word.Translations[word.ToLanguage].ToLower();
-            Console.WriteLine($"        Enter the translation of {wordToTranslate} in {list.Languages[word.ToLanguage]}");
-            practicedWords.Add(wordToTranslate);
-            enteredWord = Console.ReadLine();
-            if (enteredWord == translation)
+            string enteredWord = ".";
+
+            List<string> practicedWords = new List<string>();
+
+            int correctTranslations = 0;
+
+            while (enteredWord != "" && enteredWord != " ")
             {
-                correctTranslations++;
-                Console.WriteLine("     Correct translation");
+                var word = list.GetWordToPractice();
+
+                var wordToTranslate = word.Translations[word.FromLanguage];
+
+                var translation = word.Translations[word.ToLanguage].ToLower();
+
+                Console.WriteLine($"        Enter the translation of {wordToTranslate} in {list.Languages[word.ToLanguage]}");
+
+                practicedWords.Add(wordToTranslate);
+
+                enteredWord = Console.ReadLine();
+
+                if (enteredWord == translation)
+                {
+                    correctTranslations++;
+                    Console.WriteLine("     Correct translation");
+                }
+                else
+                {
+                    Console.WriteLine("   Wrong answer\n");
+                }
+            }
+            string.Join("-", practicedWords);
+
+            foreach (var word in practicedWords)
+            {
+                Console.Write($"   {word}");
+            }
+
+            var percentage = Math.Round(((decimal)correctTranslations / practicedWords.Count) * 100, 2);
+
+            Console.WriteLine($"\n \n   The average correct translations was {correctTranslations} / {practicedWords.Count} with percentage of {percentage} %".ToUpper());
+        }
+        else
+        {
+            Console.WriteLine("     The list that you entered doesn't exist".ToUpper());
+        }
+    }
+    public static void Dialog(string[] args)
+    {
+        ConsoleKey consoleKey = ConsoleKey.F1;
+        Console.WriteLine("     You got the following options:");
+        Console.WriteLine("     -lists");
+        Console.WriteLine("     -new <list name> <language 1> <language 2> .. <langauge n> ");
+        Console.WriteLine("     -add <list name>");
+        Console.WriteLine("     -remove <list name> <language> <word 1> <word 2> .. <word n>");
+        Console.WriteLine("     -words <listname> <sortByLanguage>");
+        Console.WriteLine("     -count <listname>");
+        Console.WriteLine("     -practice <listname>\n");
+
+
+        if ( args.Length > 0 && args[0].ToLower() == "-lists")
+        {
+            Lists();
+        }
+        else if (args.Length > 0 && args[0].ToLower() == "-new")
+        {
+            if (  args.Length > 1 && args[1].ToLower() != String.Empty)
+            {
+                var listName = args[1].ToLower();
+
+                if (args.Length > 3)
+                {
+                    List<string> languages = new List<string>();
+
+                    for (int i = 2; i < args.Length; i++)
+                    {
+                        languages.Add(args[i]);
+                    }
+                    New(listName, languages.ToArray());
+                }
+                else
+                {
+                    Console.WriteLine("     You gotta insert two languages minimum".ToUpper());
+                }
             }
             else
             {
-                Console.WriteLine("   Wrong answer\n");
+                Console.WriteLine("     Give a name to the new list, Can't be empty!".ToUpper());
             }
         }
-        string.Join("-", practicedWords);
-        foreach (var word in practicedWords)
+        else if (args.Length > 0 && args[0].ToLower() == "-add")
         {
-            Console.Write($"   {word}");
+            if (args.Length == 2 && args[1] != string.Empty && !string.IsNullOrWhiteSpace(args[1]))
+            {
+                var listName = args[1];
+                Add(listName);
+            }
+            else if (args.Length > 2 )
+            {
+                Console.WriteLine("Insert just the action and list name".ToUpper());
+                Console.WriteLine("Example : -add ListName".ToUpper());
+            }
+            else
+            {
+                Console.WriteLine("     Enter a list name as a second argument!".ToUpper());
+
+            }
         }
-        var percentage = Math.Round(((decimal)correctTranslations / practicedWords.Count) * 100, 2);
-        Console.WriteLine($"\n \n   The average correct translations was {correctTranslations} / {practicedWords.Count} with percentage of {percentage} %");
+        else if ( args.Length > 0 && args[0].ToLower() == "-remove")
+        {
+            if (args.Length >= 2 && !string.IsNullOrWhiteSpace(args[1]) && !string.IsNullOrEmpty(args[1]))
+            {
+                var listName = args[1];
+
+                if (args.Length >= 3 && args[2].All(char.IsDigit))
+                {
+                    var language = int.Parse(args[2]);
+
+                    if (args.Length >= 4)
+                    {
+                        List<string> wordsToRemove = new List<string>();
+                        for (int i = 3; i < args.Length; i++)
+                        {
+                            wordsToRemove.Add(args[i]);
+                        }
+                        Remove(listName, language, wordsToRemove.ToArray());
+                    }
+                    else
+                    {
+                        Console.WriteLine("     You entered no words to erase");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("         You must enter a language and must a number");
+                }
+            }
+            else
+            {
+                Console.WriteLine("     You must entered a list name !");
+
+            }
+        }
+        else if (args.Length > 0 && args[0].ToLower() == "-words")
+        {
+            if (args.Length >= 2 && !string.IsNullOrWhiteSpace(args[1]) && !string.IsNullOrEmpty(args[1]))
+            {
+                var listName = args[1].ToLower();
+
+                if (args.Length == 3 && args[2].All(char.IsDigit))
+                {
+                    var language = int.Parse(args[2]);
+
+                    Words(listName, language);
+
+                }
+                else
+                {
+                    Console.WriteLine("     You must enter a language to sort for, and it has to be a number!\n".ToUpper());
+                }
+            }
+            else
+            {
+                Console.WriteLine("     You must enter a list name!".ToUpper());
+
+                var lists = WordList.GetLists();
+
+                if (lists.Length != 0)
+                {
+                    Console.WriteLine("     You have the following options...".ToUpper());
+                    foreach (var list in lists)
+                    {
+                        Console.WriteLine($"        {list}".ToUpper());
+                    }
+                }
+            }
+        }
+        else if ( args.Length > 0  && args[0].ToLower() == "-count")
+        {
+            if (args.Length == 2 && !string.IsNullOrWhiteSpace(args[1]) && !string.IsNullOrEmpty(args[1]))
+            {
+                var listName = args[1].ToLower();
+
+                Count(listName);
+            }
+            else
+            {
+                Console.WriteLine("     You must enter a list name!".ToUpper());
+
+                var lists = WordList.GetLists();
+
+                if (lists.Length != 0)
+                {
+                    Console.WriteLine("     You have the following options...".ToUpper());
+                    foreach (var list in lists)
+                    {
+                        Console.WriteLine($"        {list}".ToUpper());
+                    }
+                }
+            }
+        }
+        else if (args.Length > 0 &&  args[0].ToLower() == "-practice")
+        {
+            if (args.Length == 2 && !string.IsNullOrEmpty(args[1]) && !string.IsNullOrWhiteSpace(args[1]))
+            {
+                var listName = args[1].ToLower();
+
+                Practice(listName);
+            }
+            else
+            {
+                Console.WriteLine("     You must enter a list name. You got the following lists\n".ToUpper());
+
+                var lists = WordList.GetLists();
+                if (lists.Length != 0)
+                {
+                    foreach (var lst in lists)
+                    {
+                        Console.WriteLine($"        {lst}".ToUpper());
+                    }
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("     You must choose a choice from the following options.\n".ToUpper());
+            Console.WriteLine("     You got the following options:");
+            Console.WriteLine("     -lists");
+            Console.WriteLine("     -new <list name> <language 1> <language 2> .. <langauge n> ");
+            Console.WriteLine("     -add <list name>");
+            Console.WriteLine("     -remove <list name> <language> <word 1> <word 2> .. <word n>");
+            Console.WriteLine("     -words <listname> <sortByLanguage>");
+            Console.WriteLine("     -count <listname>");
+            Console.WriteLine("     -practice <listname>");
+
+        }
     }
-    //public static string SearchedList(string listName)
-    //{
-    //    var listNames = WordList.GetLists();
-
-    //    string searchedList = string.Empty;
-
-    //    foreach (var list in listNames)
-    //    {
-    //        if (listName == list)
-    //        {
-    //            searchedList = list;
-    //        }
-    //    }
-    //    searchedList = $@"C:\Users\abdia\AppData\Local\{searchedList}.dat";
-    //    return searchedList;
-    //}
 }
+
