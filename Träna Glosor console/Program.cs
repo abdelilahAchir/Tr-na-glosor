@@ -6,11 +6,8 @@ internal class Program
 
     private static void Main(string[] args)
     {
-      
-      
 
         Dialog(args);
-        
 
 
     }
@@ -20,7 +17,7 @@ internal class Program
         var lists = WordList.GetLists();
         foreach (var list in lists)
         {
-            Console.WriteLine(list.ToUpper());
+            Console.WriteLine($"        {list.ToUpper()}");
         }
 
     }

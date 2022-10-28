@@ -10,6 +10,9 @@ namespace Träna_glosor
 
         private List<Word> _words = new List<Word>();
 
+        public List<Word> Words => _words;
+
+
         public WordList(string name, params string[] languages)
         {
             Name = name;
@@ -57,7 +60,7 @@ namespace Träna_glosor
                     searchedList = list;
                     break;
                 }
-               
+
             }
 
             if (searchedList != "")
@@ -104,27 +107,11 @@ namespace Träna_glosor
 
         public void Add(params string[] translations)
         {
-            Random random = new Random();
-            int fromLanguage = random.Next(0, translations.Length);
-            int toLanguage = random.Next(0, translations.Length);
-
-            
-                if (translations.Length != Languages.Length)
-                {
-                    throw new ArgumentException("The amount of translatiosn is wrong, Add as many tranlations as many languages there is!");
-                }
-                else
-                {
-                    while (fromLanguage == toLanguage)
-                    {
-                        fromLanguage = random.Next(0, translations.Length);
-                        toLanguage = random.Next(0, translations.Length);
-                    }
-                    if (fromLanguage != toLanguage)
-                    {
-                        _words.Add(new Word(fromLanguage, toLanguage, translations));
-                    }     
+            if (translations.Length != Languages.Length)
+            {
+                throw new ArgumentException("The amount of translatiosn is wrong, Add as many tranlations as many languages there is!");
             }
+            _words.Add(new Word(translations));
         }
 
         public bool Remove(int translation, string word)
@@ -152,7 +139,7 @@ namespace Träna_glosor
                 }
 
             }
-            
+
             return removed;
         }
 
@@ -170,12 +157,26 @@ namespace Träna_glosor
         {
             Random random = new Random();
             var rndWord = random.Next(0, _words.Count);
+            var fromLanguage = random.Next(0, Languages.Length);
+            var toLanguage = random.Next(0, Languages.Length);
             var word = _words[rndWord];
-            return word;
+            Word wrd = new Word();
+            while (fromLanguage == toLanguage)
+            {
+                fromLanguage = random.Next(0, Languages.Length);
+                toLanguage = random.Next(0, Languages.Length);
+
+            }
+
+            if (fromLanguage != toLanguage)
+            {
+                wrd = new Word(fromLanguage, toLanguage, word.Translations);
+            }
+            return wrd;
         }
         public int Count()
         {
-            var numberOFWords = (_words.Count() * Languages.Length) + Languages.Length;
+            var numberOFWords = (_words.Count() * Languages.Length);
             return numberOFWords;
         }
         public void Save()
