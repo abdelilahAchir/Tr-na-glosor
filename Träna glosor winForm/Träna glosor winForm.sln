@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Träna glosor winForm", "Träna glosor winForm\Träna glosor winForm.csproj", "{6E049F99-6C60-4750-983B-EB0CE33DAD7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E049F99-6C60-4750-983B-EB0CE33DAD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E049F99-6C60-4750-983B-EB0CE33DAD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E049F99-6C60-4750-983B-EB0CE33DAD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E049F99-6C60-4750-983B-EB0CE33DAD7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C618013-4C06-4BE8-BD9F-B5C60F5B03D4}
+	EndGlobalSection
+EndGlobal
